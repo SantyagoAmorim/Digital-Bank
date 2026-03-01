@@ -1,5 +1,6 @@
 package com.bancose.digital_bank.controller;
 
+import com.bancose.digital_bank.dto.TransactionDTO;
 import com.bancose.digital_bank.model.Account;
 import com.bancose.digital_bank.model.Transaction;
 import com.bancose.digital_bank.model.User;
@@ -54,9 +55,13 @@ public class TransactionController {
     }
 
     @GetMapping("/statement/{email}")
-    public ResponseEntity<List<Transaction>> getStatement(@PathVariable String email) {
+    public ResponseEntity<List<TransactionDTO>> getStatement(@PathVariable String email) {
         Account account = getAccountByEmail(email);
-        return ResponseEntity.ok(transactionService.getStatement(account));
+        List<TransactionDTO> statement = transactionService.getStatement(account)
+                .stream()
+                .map(transactionService::toDTO)
+                .toList();
+        return ResponseEntity.ok(statement);
     }
 
     private Account getAccountByEmail(String email) {

@@ -1,5 +1,6 @@
 package com.bancose.digital_bank.service;
 
+import com.bancose.digital_bank.dto.TransactionDTO;
 import com.bancose.digital_bank.model.Account;
 import com.bancose.digital_bank.model.Transaction;
 import com.bancose.digital_bank.model.Transaction.TransactionType;
@@ -96,5 +97,19 @@ public class TransactionService {
     public List<Transaction> getStatement(Account account) {
         return transactionRepository
                 .findBySourceAccountOrDestinationAccountOrderByCreatedAtDesc(account, account);
+    }
+    public TransactionDTO toDTO(Transaction transaction) {
+        return new TransactionDTO(
+                transaction.getId(),
+                transaction.getType(),
+                transaction.getAmount(),
+                transaction.getSourceAccount() != null
+                        ? transaction.getSourceAccount().getId().toString()
+                        : null,
+                transaction.getDestinationAccount() != null
+                        ? transaction.getDestinationAccount().getId().toString()
+                        : null,
+                transaction.getCreatedAt()
+        );
     }
 }
