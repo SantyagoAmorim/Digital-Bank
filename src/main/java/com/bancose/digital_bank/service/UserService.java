@@ -14,6 +14,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public User register(String name, String email, String rawPassword) {
 
@@ -29,5 +30,16 @@ public class UserService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public String login(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new RuntimeException("Senha incorreta");
+        }
+
+        return jwtService.generateToken(email);
     }
 }
