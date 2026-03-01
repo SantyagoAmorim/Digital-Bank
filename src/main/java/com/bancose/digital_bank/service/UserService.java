@@ -1,11 +1,14 @@
 package com.bancose.digital_bank.service;
 
+import com.bancose.digital_bank.model.Account;
 import com.bancose.digital_bank.model.User;
+import com.bancose.digital_bank.repository.AccountRepository;
 import com.bancose.digital_bank.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -15,6 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AccountRepository accountRepository;
 
     public User register(String name, String email, String rawPassword) {
 
@@ -29,7 +33,17 @@ public class UserService {
                 .CreatedAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        Account account = Account.builder()
+                .user(user)
+                .balance(BigDecimal.ZERO)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        accountRepository.save(account);
+
+        return user;
     }
 
     public String login(String email, String rawPassword) {
